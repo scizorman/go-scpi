@@ -14,6 +14,13 @@ type Handler struct {
 	Client
 }
 
+// NewHandler returns a new handler for a device controlled using SCPI commands.
+func NewHandler(client Client) *Handler {
+	return &Handler{
+		Client: client,
+	}
+}
+
 // Reset resets the instrument to a factory pre-defined condition and clears the error log.
 func (h *Handler) Reset() error {
 	return h.Exec("*RST;*CLS")
