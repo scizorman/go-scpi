@@ -42,7 +42,7 @@ type Handler interface {
 	QueryEventStatusRegister() (bits uint8, err error)
 
 	// SetServiceRequestEnable sets the value of the Service Request Enable register.
-	SetServiceRequestEnable() (bits uint8, err error)
+	SetServiceRequestEnable(bits uint8) error
 
 	// QueryServiceRequestEnable queries the Service Request Enable.
 	QueryServiceRequestEnable() (bits uint8, err error)
