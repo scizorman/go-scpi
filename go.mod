@@ -1,4 +1,4 @@
-module github.com/scizorman/go-scpi/v1
+module github.com/scizorman/go-scpi
 
 go 1.12
 
