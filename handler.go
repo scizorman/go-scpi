@@ -40,7 +40,7 @@ type Handler interface {
 	SetServiceRequestEnable() (bits uint8, err error)
 
 	// QueryServiceRequestEnable queries the Service Request Enable.
-	QuerySRE() (bits uint8, err error)
+	QueryServiceRequestEnable() (bits uint8, err error)
 
 	// QueryStatusByteRegister queries the Status Byte Register.
 	QueryStatusByteRegister() (bits uint8, err error)
