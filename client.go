@@ -39,7 +39,7 @@ func NewClient(proto, addr string) (Client, error) {
 	case "tcp":
 		return newTCPClient(addr)
 	default:
-		// TODO: Refactor the timeout error
+		// TODO(scizorman): Refactor the timeout error
 		return nil, xerrors.New("invalid protocol")
 	}
 }
@@ -90,8 +90,8 @@ func (c *TCPClient) Ping() error {
 }
 
 // PingContext implements the Client PingContext method.
-// TODO: Implement
 func (c *TCPClient) PingContext(ctx context.Context) error {
+	// BUG(scizorman): PingContext is not implemented yet.
 	return nil
 }
 

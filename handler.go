@@ -41,7 +41,7 @@ func (h *Handler) WaitForComplete(timeout time.Duration) error {
 	case err := <-ch:
 		return err
 	case <-ctx.Done():
-		// TODO: Refactor the timeout error
+		// TODO(scizorman): Refactor the timeout error
 		return xerrors.New("timeout")
 	}
 }
@@ -54,11 +54,12 @@ func (h *Handler) Trigger() error {
 }
 
 // Identify returns the identification data.
+//
 // The standards order is follows:
-// - Manufacturer
-// - Model number
-// - Serial number (or 0)
-// - Firmware version
+//     Manufacturer
+//     Model number
+//     Serial number (or 0)
+//     Firmware version
 func (h *Handler) Identify() (id string, err error) {
 	res, err := h.Query("*IDN?")
 	if err != nil {
@@ -127,7 +128,7 @@ func (h *Handler) QueryStatusByteRegister() (bits uint8, err error) {
 // in locations 0 through 9 with the Save.
 func (h *Handler) Recall(mem uint8) error {
 	if mem > 9 {
-		// TODO: Refactor the timeout error
+		// TODO(scizorman): Refactor the timeout error
 		return xerrors.New("only 0 to 10 are allowed")
 	}
 
@@ -138,7 +139,7 @@ func (h *Handler) Recall(mem uint8) error {
 // Save saves the instrument setting to one of the ten non-volatile memory locations.
 func (h *Handler) Save(mem uint8) error {
 	if mem > 9 {
-		// TODO: Refactor the timeout error
+		// TODO(scizorman): Refactor the timeout error
 		return xerrors.New("only 0 to 10 are allowed")
 	}
 
