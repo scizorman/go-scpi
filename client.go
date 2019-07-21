@@ -3,6 +3,8 @@ package scpi
 import (
 	"context"
 	"net"
+
+	"golang.org/x/xerrors"
 )
 
 // Client is a client of a device controlled using SCPI commands.
@@ -31,9 +33,36 @@ type Client interface {
 	QueryContext(ctx context.Context, cmd string) (res []byte, err error)
 }
 
+// NewClient returns a new client of a device controlled using SCPI commands.
+func NewClient(proto, addr string) (Client, error) {
+	switch proto {
+	case "tcp":
+		return newTCPClient(addr)
+	default:
+		// TODO: Refactor the timeout error
+		return nil, xerrors.New("invalid protocol")
+	}
+}
+
 // TCPClient is an implementation of the Client interface for TCP network connections.
 type TCPClient struct {
 	conn *net.TCPConn
+}
+
+func newTCPClient(addr string) (*TCPClient, error) {
+	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
+	if err != nil {
+		return nil, err
+	}
+
+	conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	if err != nil {
+		return nil, err
+	}
+	client := &TCPClient{
+		conn: conn,
+	}
+	return client, nil
 }
 
 // Close implements the Client Close method.
