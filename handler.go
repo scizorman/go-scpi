@@ -3,6 +3,7 @@ package scpi
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -84,7 +85,7 @@ func (h *Handler) QueryEventStatusEnable() (bits uint8, err error) {
 		return 0, err
 	}
 
-	return h.bytesToUint8(res)
+	return strToUint8(string(res))
 }
 
 // QueryEventStatusRegister queries the event status register.
@@ -95,7 +96,7 @@ func (h *Handler) QueryEventStatusRegister() (bits uint8, err error) {
 		return 0, err
 	}
 
-	return h.bytesToUint8(res)
+	return strToUint8(string(res))
 }
 
 // SetServiceRequestEnable sets the value of the Service Request Enable register.
@@ -111,7 +112,7 @@ func (h *Handler) QueryServiceRequestEnable() (bits uint8, err error) {
 		return 0, err
 	}
 
-	return h.bytesToUint8(res)
+	return strToUint8(string(res))
 }
 
 // QueryStatusByteRegister queries the Status Byte Register.
@@ -121,7 +122,7 @@ func (h *Handler) QueryStatusByteRegister() (bits uint8, err error) {
 		return 0, err
 	}
 
-	return h.bytesToUint8(res)
+	return strToUint8(string(res))
 }
 
 // Recall restored the instrument to a state that was previously stored
@@ -147,12 +148,12 @@ func (h *Handler) Save(mem uint8) error {
 	return h.Exec(cmd)
 }
 
-func (h *Handler) bytesToUint8(bytes []byte) (n uint8, err error) {
-	num64, err := strconv.ParseUint(string(bytes), 10, 8)
+func strToUint8(bitStr string) (bits uint8, err error) {
+	re := regexp.MustCompile(`[0-9]{1,3}`)
+	n, err := strconv.ParseUint(re.FindString(bitStr), 10, 8)
 	if err != nil {
 		return 0, err
 	}
-
-	n = uint8(num64)
-	return n, nil
+	bits = uint8(n)
+	return bits, nil
 }
