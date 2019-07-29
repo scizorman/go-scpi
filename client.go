@@ -3,6 +3,7 @@ package scpi
 import (
 	"context"
 	"net"
+	"time"
 
 	"golang.org/x/xerrors"
 )
@@ -34,10 +35,10 @@ type Client interface {
 }
 
 // NewClient returns a new client of a device controlled using SCPI commands.
-func NewClient(proto, addr string) (Client, error) {
+func NewClient(proto, addr string, timeout time.Duration) (Client, error) {
 	switch proto {
 	case "tcp":
-		return newTCPClient(addr)
+		return newTCPClient(addr, timeout)
 	default:
 		// TODO(scizorman): Refactor the timeout error
 		return nil, xerrors.New("invalid protocol")
@@ -49,18 +50,25 @@ type TCPClient struct {
 	conn *net.TCPConn
 }
 
-func newTCPClient(addr string) (*TCPClient, error) {
+func newTCPClient(addr string, timeout time.Duration) (*TCPClient, error) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
 		return nil, err
 	}
 
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
+	d := net.Dialer{
+		Timeout: timeout,
+	}
+	conn, err := d.Dial("tcp", tcpAddr.String())
 	if err != nil {
 		return nil, err
 	}
+	tcpConn, ok := conn.(*net.TCPConn)
+	if !ok {
+		return nil, xerrors.Errorf("failed to case %T to *net.TCPConn", conn)
+	}
 	client := &TCPClient{
-		conn: conn,
+		conn: tcpConn,
 	}
 	return client, nil
 }
