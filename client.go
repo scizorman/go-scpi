@@ -40,8 +40,7 @@ func NewClient(proto, addr string, timeout time.Duration) (Client, error) {
 	case "tcp":
 		return newTCPClient(addr, timeout)
 	default:
-		// TODO(scizorman): Refactor the timeout error
-		return nil, xerrors.New("invalid protocol")
+		return nil, xerrors.Errorf("invalid protocol %s", proto)
 	}
 }
 
