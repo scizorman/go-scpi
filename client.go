@@ -3,6 +3,7 @@ package scpi
 import (
 	"context"
 	"net"
+	"strings"
 	"time"
 
 	"golang.org/x/xerrors"
@@ -18,6 +19,12 @@ type Client interface {
 
 	// ExecContext executes a SCPI command.
 	ExecContext(ctx context.Context, cmd string) error
+
+	// BulkExec executes multiple SCPI commands.
+	BulkExec(cmds ...string) error
+
+	// BulkExecContext executes multiple SCPI commands.
+	BulkExecContext(ctx context.Context, cmds ...string) error
 
 	// Ping verifies the connection to the device is still alive,
 	// establishing a connection if necessary.
@@ -89,6 +96,17 @@ func (c *TCPClient) ExecContext(ctx context.Context, cmd string) error {
 		return err
 	}
 	return nil
+}
+
+// BulkExec implements the Client BulkExec method.
+func (c *TCPClient) BulkExec(cmds ...string) error {
+	return c.BulkExecContext(context.Background(), cmds...)
+}
+
+// BulkExecContext implements the Client BulkExecContext method.
+func (c *TCPClient) BulkExecContext(ctx context.Context, cmds ...string) error {
+	cmd := strings.Join(cmds, ";")
+	return c.ExecContext(ctx, cmd)
 }
 
 // Ping implements the Client Ping method.
