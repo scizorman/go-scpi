@@ -2,11 +2,10 @@ package scpi
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"strings"
 	"time"
-
-	"golang.org/x/xerrors"
 )
 
 // Client is a client of a device controlled using SCPI commands.
@@ -71,7 +70,7 @@ func newTCPClient(addr string, timeout time.Duration) (*TCPClient, error) {
 	}
 	tcpConn, ok := conn.(*net.TCPConn)
 	if !ok {
-		return nil, xerrors.Errorf("failed to case %T to *net.TCPConn", conn)
+		return nil, fmt.Errorf("failed to cast %T to *net.TCPConn", conn)
 	}
 	client := &TCPClient{
 		conn: tcpConn,

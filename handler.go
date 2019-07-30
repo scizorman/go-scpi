@@ -2,12 +2,11 @@ package scpi
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
 	"time"
-
-	"golang.org/x/xerrors"
 )
 
 // Handler is a handler for a device controlled using SCPI commands.
@@ -43,7 +42,7 @@ func (h *Handler) WaitForComplete(timeout time.Duration) error {
 		return err
 	case <-ctx.Done():
 		// TODO(scizorman): Refactor the timeout error
-		return xerrors.New("timeout")
+		return errors.New("timeout")
 	}
 }
 
@@ -130,7 +129,7 @@ func (h *Handler) QueryStatusByteRegister() (bits uint8, err error) {
 func (h *Handler) Recall(mem uint8) error {
 	if mem > 9 {
 		// TODO(scizorman): Refactor the timeout error
-		return xerrors.New("only 0 to 10 are allowed")
+		return errors.New("only 0 to 10 are allowed")
 	}
 
 	cmd := fmt.Sprintf("*RCL %d", mem)
@@ -141,7 +140,7 @@ func (h *Handler) Recall(mem uint8) error {
 func (h *Handler) Save(mem uint8) error {
 	if mem > 9 {
 		// TODO(scizorman): Refactor the timeout error
-		return xerrors.New("only 0 to 10 are allowed")
+		return errors.New("only 0 to 10 are allowed")
 	}
 
 	cmd := fmt.Sprintf("*SAV %d", mem)
