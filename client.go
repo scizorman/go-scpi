@@ -109,6 +109,9 @@ func (c *TCPClient) queryError(ctx context.Context, cmd string) error {
 
 	re := errorRegexp.Copy()
 	g := re.FindStringSubmatch(res)
+	if g == nil {
+		return fmt.Errorf("invalid error format: %s", res)
+	}
 
 	code, err := strconv.Atoi(g[1])
 	if err != nil {
