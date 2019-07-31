@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -94,7 +96,30 @@ func (c *TCPClient) ExecContext(ctx context.Context, cmd string) error {
 	if _, err := c.conn.Write(b); err != nil {
 		return err
 	}
-	return nil
+	return c.queryError(ctx, cmd)
+}
+
+var errorRegexp = regexp.MustCompile(`([+-]\d{1,3}),\"(.*?)\"`)
+
+func (c *TCPClient) queryError(ctx context.Context, cmd string) error {
+	res, err := c.Query("SYST:ERR?")
+	if err != nil {
+		return err
+	}
+
+	re := errorRegexp.Copy()
+	g := re.FindStringSubmatch(string(res))
+
+	code, err := strconv.Atoi(g[1])
+	if err != nil {
+		return err
+	}
+	msg := strings.ToLower(g[2])
+
+	if code == 0 {
+		return nil
+	}
+	return newCommandError(cmd, code, msg)
 }
 
 // BulkExec implements the Client BulkExec method.
