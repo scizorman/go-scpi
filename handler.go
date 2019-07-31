@@ -41,8 +41,8 @@ func (h *Handler) WaitForComplete(timeout time.Duration) error {
 	case err := <-ch:
 		return err
 	case <-ctx.Done():
-		// TODO(scizorman): Refactor the timeout error
-		return errors.New("timeout")
+		// TODO(scizorman): Refactor the error
+		return ctx.Err()
 	}
 }
 
