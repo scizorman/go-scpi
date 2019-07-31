@@ -36,10 +36,10 @@ type Client interface {
 	PingContext(ctx context.Context) error
 
 	// Query queries the device for the results of the specified command.
-	Query(cmd string) (res []byte, err error)
+	Query(cmd string) (res string, err error)
 
 	// QueryContext queries the device for the results of the specified command.
-	QueryContext(ctx context.Context, cmd string) (res []byte, err error)
+	QueryContext(ctx context.Context, cmd string) (res string, err error)
 }
 
 // NewClient returns a new client of a device controlled using SCPI commands.
@@ -108,7 +108,7 @@ func (c *TCPClient) queryError(ctx context.Context, cmd string) error {
 	}
 
 	re := errorRegexp.Copy()
-	g := re.FindStringSubmatch(string(res))
+	g := re.FindStringSubmatch(res)
 
 	code, err := strconv.Atoi(g[1])
 	if err != nil {
@@ -145,20 +145,22 @@ func (c *TCPClient) PingContext(ctx context.Context) error {
 }
 
 // Query implements the Client Query method.
-func (c *TCPClient) Query(cmd string) (res []byte, err error) {
+func (c *TCPClient) Query(cmd string) (res string, err error) {
 	return c.QueryContext(context.Background(), cmd)
 }
 
 // QueryContext implements the Client QueryContext method.
-func (c *TCPClient) QueryContext(ctx context.Context, cmd string) (res []byte, err error) {
+func (c *TCPClient) QueryContext(ctx context.Context, cmd string) (res string, err error) {
 	if err := c.ExecContext(ctx, cmd); err != nil {
-		return nil, err
+		return "", err
 	}
 
-	res = make([]byte, 1024)
-	l, err := c.conn.Read(res)
+	buf := make([]byte, 1024)
+	l, err := c.conn.Read(buf)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return res[:l], nil
+
+	res = string(buf[:l])
+	return res, nil
 }
