@@ -92,11 +92,18 @@ func (c *TCPClient) Exec(cmd string) error {
 
 // ExecContext implements the Client ExecContext method.
 func (c *TCPClient) ExecContext(ctx context.Context, cmd string) error {
+	if err := c.exec(ctx, cmd); err != nil {
+		return fmt.Errorf("failed to execute the command '%s': %s", cmd, err)
+	}
+	return c.queryError(ctx, cmd)
+}
+
+func (c *TCPClient) exec(ctx context.Context, cmd string) error {
 	b := []byte(cmd + "\n")
 	if _, err := c.conn.Write(b); err != nil {
 		return err
 	}
-	return c.queryError(ctx, cmd)
+	return nil
 }
 
 var errorRegexp = regexp.MustCompile(`([+-]\d{1,3}),\"(.*?)\"`)
@@ -154,7 +161,7 @@ func (c *TCPClient) Query(cmd string) (res string, err error) {
 
 // QueryContext implements the Client QueryContext method.
 func (c *TCPClient) QueryContext(ctx context.Context, cmd string) (res string, err error) {
-	if err := c.ExecContext(ctx, cmd); err != nil {
+	if err := c.exec(ctx, cmd); err != nil {
 		return "", err
 	}
 
