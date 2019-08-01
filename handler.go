@@ -23,7 +23,7 @@ func NewHandler(client Client) *Handler {
 
 // Reset resets the instrument to a factory pre-defined condition and clears the error log.
 func (h *Handler) Reset() error {
-	return h.Exec("*RST;*CLS")
+	return h.BulkExec("*RST", "CLS")
 }
 
 // WaitForComplete waits for all queued operations to complete up to the specified timeout.
