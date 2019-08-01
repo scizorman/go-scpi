@@ -155,7 +155,7 @@ func parseBit(s string) (bit uint8, err error) {
 	if g == nil {
 		return 0, fmt.Errorf("invalid bit format: %s", s)
 	}
-	n, err := strconv.ParseUint(s, 10, 8)
+	n, err := strconv.ParseUint(g[1], 10, 8)
 	if err != nil {
 		return 0, err
 	}
