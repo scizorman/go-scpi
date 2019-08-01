@@ -2,7 +2,6 @@ package scpi
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -127,22 +126,12 @@ func (h *Handler) QueryStatusByteRegister() (bit uint8, err error) {
 // Recall restored the instrument to a state that was previously stored
 // in locations 0 through 9 with the Save.
 func (h *Handler) Recall(mem uint8) error {
-	if mem > 9 {
-		// TODO(scizorman): Refactor the timeout error
-		return errors.New("only 0 to 10 are allowed")
-	}
-
 	cmd := fmt.Sprintf("*RCL %d", mem)
 	return h.Exec(cmd)
 }
 
 // Save saves the instrument setting to one of the ten non-volatile memory locations.
 func (h *Handler) Save(mem uint8) error {
-	if mem > 9 {
-		// TODO(scizorman): Refactor the timeout error
-		return errors.New("only 0 to 10 are allowed")
-	}
-
 	cmd := fmt.Sprintf("*SAV %d", mem)
 	return h.Exec(cmd)
 }
