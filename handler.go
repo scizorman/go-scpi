@@ -72,56 +72,56 @@ func (h *Handler) Identify() (id string, err error) {
 
 // SetEventStatusEnable sets the value in the enable register for the Standard Event Status group.
 // The selected bits are then reported to bit 5 of the Status Byte.
-func (h *Handler) SetEventStatusEnable(bits uint8) error {
-	cmd := fmt.Sprintf("*ESE %d", bits)
+func (h *Handler) SetEventStatusEnable(bit uint8) error {
+	cmd := fmt.Sprintf("*ESE %d", bit)
 	return h.Exec(cmd)
 }
 
 // QueryEventStatusEnable queries the event status enable.
-func (h *Handler) QueryEventStatusEnable() (bits uint8, err error) {
+func (h *Handler) QueryEventStatusEnable() (bit uint8, err error) {
 	res, err := h.Query("*ESE?")
 	if err != nil {
 		return 0, err
 	}
 
-	return strToUint8(string(res))
+	return parseBit(res)
 }
 
 // QueryEventStatusRegister queries the event status register.
 // The register is cleared when it is executed.
-func (h *Handler) QueryEventStatusRegister() (bits uint8, err error) {
+func (h *Handler) QueryEventStatusRegister() (bit uint8, err error) {
 	res, err := h.Query("*ESR?")
 	if err != nil {
 		return 0, err
 	}
 
-	return strToUint8(string(res))
+	return parseBit(res)
 }
 
 // SetServiceRequestEnable sets the value of the Service Request Enable register.
-func (h *Handler) SetServiceRequestEnable(bits uint8) error {
-	cmd := fmt.Sprintf("*SRE %d", bits)
+func (h *Handler) SetServiceRequestEnable(bit uint8) error {
+	cmd := fmt.Sprintf("*SRE %d", bit)
 	return h.Exec(cmd)
 }
 
 // QueryServiceRequestEnable queries the Service Request Enable.
-func (h *Handler) QueryServiceRequestEnable() (bits uint8, err error) {
+func (h *Handler) QueryServiceRequestEnable() (bit uint8, err error) {
 	res, err := h.Query("*SRE?")
 	if err != nil {
 		return 0, err
 	}
 
-	return strToUint8(string(res))
+	return parseBit(res)
 }
 
 // QueryStatusByteRegister queries the Status Byte Register.
-func (h *Handler) QueryStatusByteRegister() (bits uint8, err error) {
+func (h *Handler) QueryStatusByteRegister() (bit uint8, err error) {
 	res, err := h.Query("*STB?")
 	if err != nil {
 		return 0, err
 	}
 
-	return strToUint8(string(res))
+	return parseBit(res)
 }
 
 // Recall restored the instrument to a state that was previously stored
@@ -147,12 +147,18 @@ func (h *Handler) Save(mem uint8) error {
 	return h.Exec(cmd)
 }
 
-func strToUint8(bitStr string) (bits uint8, err error) {
-	re := regexp.MustCompile(`[0-9]{1,3}`)
-	n, err := strconv.ParseUint(re.FindString(bitStr), 10, 8)
+var bitRegexp = regexp.MustCompile(`\+(\d+)`)
+
+func parseBit(s string) (bit uint8, err error) {
+	re := bitRegexp.Copy()
+	g := re.FindStringSubmatch(s)
+	if g == nil {
+		return 0, fmt.Errorf("invalid bit format: %s", s)
+	}
+	n, err := strconv.ParseUint(s, 10, 8)
 	if err != nil {
 		return 0, err
 	}
-	bits = uint8(n)
-	return bits, nil
+	bit = uint8(n)
+	return bit, nil
 }
