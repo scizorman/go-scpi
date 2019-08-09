@@ -56,11 +56,3 @@ func confirmError(cmd, errRes string) error {
 	}
 	return cmdErr
 }
-
-func newCommandError(cmd string, code int, msg string) *CommandError {
-	return &CommandError{
-		cmd:  cmd,
-		code: code,
-		msg:  msg,
-	}
-}
