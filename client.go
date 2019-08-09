@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -95,7 +93,7 @@ func (c *TCPClient) ExecContext(ctx context.Context, cmd string) error {
 	if err := c.exec(ctx, cmd); err != nil {
 		return fmt.Errorf("failed to execute the command '%s': %s", cmd, err)
 	}
-	return c.checkError(ctx, cmd)
+	return c.queryError(ctx, cmd)
 }
 
 func (c *TCPClient) exec(ctx context.Context, cmd string) error {
@@ -106,37 +104,13 @@ func (c *TCPClient) exec(ctx context.Context, cmd string) error {
 	return nil
 }
 
-func (c *TCPClient) checkError(ctx context.Context, cmd string) error {
-	code, msg, err := c.queryError(ctx)
+func (c *TCPClient) queryError(ctx context.Context, prevCmd string) error {
+	res, err := c.QueryContext(ctx, "SYST:ERR?")
 	if err != nil {
 		return err
 	}
-	if code == 0 {
-		return nil
-	}
-	return newCommandError(cmd, code, msg)
-}
 
-var errorRegexp = regexp.MustCompile(`([+-]\d{1,3}),\"(.*?)\"`)
-
-func (c *TCPClient) queryError(ctx context.Context) (code int, msg string, err error) {
-	res, err := c.QueryContext(ctx, "SYST:ERR?")
-	if err != nil {
-		return 0, "", err
-	}
-
-	re := errorRegexp.Copy()
-	g := re.FindStringSubmatch(res)
-	if g == nil {
-		return 0, "", fmt.Errorf("invalid error format: %s", res)
-	}
-
-	code, err = strconv.Atoi(g[1])
-	if err != nil {
-		return 0, "", err
-	}
-	msg = strings.ToLower(g[2])
-	return code, msg, nil
+	return confirmError(prevCmd, res)
 }
 
 // BulkExec implements the Client BulkExec method.
