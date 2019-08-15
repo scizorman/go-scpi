@@ -11,7 +11,7 @@ import (
 type InvalidProtocolError string
 
 func (e InvalidProtocolError) Error() string {
-	return fmt.Sprintf("invalid protocol %s", e)
+	return fmt.Sprintf("invalid protocol %s", string(e))
 }
 
 // CommandError is the error of SCPI commands.
