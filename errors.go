@@ -14,6 +14,13 @@ func (e InvalidProtocolError) Error() string {
 	return fmt.Sprintf("invalid protocol %s", string(e))
 }
 
+// InvalidFormatError occures if the format of the response is invalid.
+type InvalidFormatError string
+
+func (e InvalidFormatError) Error() string {
+	return fmt.Sprintf("invalid format: %s", string(e))
+}
+
 // CommandError is the error of SCPI commands.
 type CommandError struct {
 	cmd  string
@@ -36,7 +43,7 @@ func confirmError(cmd, errRes string) error {
 	re := cmdErrRegexp.Copy()
 	g := re.FindStringSubmatch(errRes)
 	if g == nil {
-		return fmt.Errorf("invalid error format: %s", errRes)
+		return InvalidFormatError(errRes)
 	}
 
 	code, err := strconv.Atoi(g[1])
