@@ -64,6 +64,17 @@ func TestConfirmError(t *testing.T) {
 				msg:  "invalid character",
 			},
 		},
+		"CommandErrorWithoutQuotes": {
+			in: map[string]string{
+				"cmd":    "foo",
+				"errRes": "-101, Invalid character",
+			},
+			want: &CommandError{
+				cmd:  "foo",
+				code: -101,
+				msg:  "invalid character",
+			},
+		},
 	}
 
 	for n, tt := range tests {
