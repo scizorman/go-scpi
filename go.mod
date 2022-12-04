@@ -1,3 +1,3 @@
 module github.com/autonomoosetech/go-scpi
 
-go 1.13
+go 1.19
