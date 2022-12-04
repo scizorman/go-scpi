@@ -46,7 +46,10 @@ func confirmError(cmd, errRes string) error {
 		return InvalidFormatError(errRes)
 	}
 
-	code, _ := strconv.Atoi(g[1])
+	code, err := strconv.Atoi(g[1])
+	if err != nil {
+		return err
+	}
 	if code == 0 {
 		return nil
 	}
