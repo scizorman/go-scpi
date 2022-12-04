@@ -69,8 +69,11 @@ func TestConfirmError(t *testing.T) {
 	for n, tt := range tests {
 		t.Run(n, func(t *testing.T) {
 			err := confirmError(tt.in["cmd"], tt.in["errRes"])
-			if got, want := err, tt.want; !(errors.Is(got, want) || errors.As(got, &want)) {
-				t.Fatalf("got %+v, want %+v", got, want)
+			if got, want := err, tt.want; !(errors.Is(got, want)) {
+				cast, _ := want.(*CommandError)
+				if !errors.As(got, &cast) {
+					t.Fatalf("got %+v, want %+v", got, want)
+				}
 			}
 		})
 	}
