@@ -109,4 +109,3 @@ func (c *TCPClient) QueryContext(ctx context.Context, cmd string) (res string, e
 	res = string(buf[:l])
 	return res, nil
 }
-

@@ -55,10 +55,11 @@ func (h *Handler) Trigger(ctx context.Context) error {
 // Identify returns the identification data.
 //
 // The standards order is follows:
-//     Manufacturer
-//     Model number
-//     Serial number (or 0)
-//     Firmware version
+//
+//	Manufacturer
+//	Model number
+//	Serial number (or 0)
+//	Firmware version
 func (h *Handler) Identify(ctx context.Context) (id string, err error) {
 	res, err := h.QueryContext(ctx, "*IDN?")
 	if err != nil {
